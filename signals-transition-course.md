@@ -26,7 +26,7 @@ import { FormsModule } from '@angular/forms';
 After: Bring in the signal squad! 🦸‍♂️
 
 ```typescript
-import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 ```
 
@@ -44,23 +44,7 @@ After: Signal-ify it! Now it's alive and kicking. 💃
 protected todos = signal<Array<{ id: number; text: string; done: boolean }>>([]);
 ```
 
-### 3. Add computed for smart checks
-
-Before: A helper method that runs every time. Lazy, but works. 😒
-
-```typescript
-protected hasCompleted(): boolean {
-  return this.todos.some((todo) => todo.done);
-}
-```
-
-After: Computed signal – it's smart, reactive, and only recalculates when needed. Brainy! 🧠
-
-```typescript
-protected hasCompleted = computed(() => this.todos().some((todo) => todo.done));
-```
-
-### 4. Auto-save with effect
+### 3. Auto-save with effect
 
 Before: Manual save after every change. Tedious, like doing dishes by hand. 🧽
 
@@ -78,7 +62,7 @@ effect(() => {
 });
 ```
 
-### 5. Update methods to use signal updates
+### 4. Update methods to use signal updates
 
 Before: Direct array mutation, then manual save. Clunky. 🤕
 
@@ -93,14 +77,13 @@ After: Signal update – clean, reactive, and no extra steps. Smooth operator! �
 this.todos.update((current) => [...current, nextTodo]);
 ```
 
-### 6. Template tweaks
+### 5. Template tweaks
 
 Before: Direct array access. Static. 📜
 
 ```html
 @if (todos.length === 0) {
 @for (todo of todos; track todo.id) {
-@if (hasCompleted()) {
 ```
 
 After: Call the signals! Now it's dynamic and fun. 🎢
@@ -108,8 +91,40 @@ After: Call the signals! Now it's dynamic and fun. 🎢
 ```html
 @if (todos().length === 0) {
 @for (todo of todos(); track todo.id) {
-@if (hasCompleted()) {
 ```
+
+## Signal methods: .set, .update, and .effect
+
+Signals have superpowers! Here's the trio you need to know:
+
+### .set() - The Direct Setter
+Use `.set()` to replace the entire signal value. Like assigning a new value directly. Perfect for simple changes.
+
+```typescript
+// Set a new array
+this.todos.set([{ id: 1, text: 'New todo', done: false }]);
+```
+
+### .update() - The Smart Updater
+Use `.update()` to modify based on the current value. Pass a function that gets the current value and returns the new one. Great for arrays and objects.
+
+```typescript
+// Add to the current array
+this.todos.update((current) => [...current, newTodo]);
+```
+
+### .effect() - The Watcher
+Use `.effect()` for side effects that run when signals change. It tracks dependencies automatically. Ideal for logging, saving, or API calls.
+
+```typescript
+// Auto-save on change
+effect(() => {
+  console.log('Todos changed:', this.todos());
+  localStorage.setItem('todos', JSON.stringify(this.todos()));
+});
+```
+
+Remember: `.set()` and `.update()` change the signal; `.effect()` reacts to changes. Use them wisely! 🛠️
 
 ## Conclusion: signals win!
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -16,9 +16,6 @@ export class App implements OnInit {
 
   // Signal holding the array of todo items for reactive updates.
   protected todos = signal<Array<{ id: number; text: string; done: boolean }>>([]);
-
-  // Computed signal to check if any todo is completed, for template use.
-  protected hasCompleted = computed(() => this.todos().some((todo) => todo.done));
 
   // Load any persisted todos as soon as the component initializes, then set up auto-save.
   public ngOnInit(): void {
@@ -54,11 +51,6 @@ export class App implements OnInit {
   // Remove one todo by id so the list stays tidy.
   protected removeTodo(id: number): void {
     this.todos.update((current) => current.filter((todo) => todo.id !== id));
-  }
-
-  // Clear all completed items in one click to declutter.
-  protected clearCompleted(): void {
-    this.todos.update((current) => current.filter((todo) => !todo.done));
   }
 
   // Retrieve persisted todos from localStorage, safely handling bad data.
