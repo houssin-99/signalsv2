@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -14,12 +14,19 @@ export class App implements OnInit {
   // Two-way bound input value for the text field.
   protected draftText = '';
 
-  // Plain array of todo items; we avoid signals/observables by design.
-  protected todos: Array<{ id: number; text: string; done: boolean }> = [];
+  // Signal holding the array of todo items for reactive updates.
+  protected todos = signal<Array<{ id: number; text: string; done: boolean }>>([]);
 
-  // Load any persisted todos as soon as the component initializes.
+  // Computed signal to check if any todo is completed, for template use.
+  protected hasCompleted = computed(() => this.todos().some((todo) => todo.done));
+
+  // Load any persisted todos as soon as the component initializes, then set up auto-save.
   public ngOnInit(): void {
     this.loadTodosFromStorage();
+    // Auto-save to localStorage whenever todos change.
+    effect(() => {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
+    });
   }
 
   // Add a new todo using the current draft text, then reset the input.
@@ -31,29 +38,27 @@ export class App implements OnInit {
 
     // Simple id using timestamp to avoid collisions in this demo.
     const nextTodo = { id: Date.now(), text, done: false };
-    this.todos = [...this.todos, nextTodo];
-    this.persistTodos();
+    this.todos.update((current) => [...current, nextTodo]);
     this.draftText = '';
   }
 
   // Toggle completion state for a single todo item.
   protected toggleTodo(id: number): void {
-    this.todos = this.todos.map((todo) =>
-      todo.id === id ? { ...todo, done: !todo.done } : todo
+    this.todos.update((current) =>
+      current.map((todo) =>
+        todo.id === id ? { ...todo, done: !todo.done } : todo
+      )
     );
-    this.persistTodos();
   }
 
   // Remove one todo by id so the list stays tidy.
   protected removeTodo(id: number): void {
-    this.todos = this.todos.filter((todo) => todo.id !== id);
-    this.persistTodos();
+    this.todos.update((current) => current.filter((todo) => todo.id !== id));
   }
 
   // Clear all completed items in one click to declutter.
   protected clearCompleted(): void {
-    this.todos = this.todos.filter((todo) => !todo.done);
-    this.persistTodos();
+    this.todos.update((current) => current.filter((todo) => !todo.done));
   }
 
   // Retrieve persisted todos from localStorage, safely handling bad data.
@@ -66,16 +71,11 @@ export class App implements OnInit {
     try {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        this.todos = parsed;
+        this.todos.set(parsed);
       }
     } catch {
       // Ignore malformed storage; start fresh without crashing.
-      this.todos = [];
+      this.todos.set([]);
     }
-  }
-
-  // Save the current todo array so the list survives reloads.
-  private persistTodos(): void {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.todos));
   }
 }
