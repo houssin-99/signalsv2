@@ -1,6 +1,6 @@
 # Introduction to signals
 
-Hey there, future signal masters! 😎 If you're a beginner fullstack dev like me, you've probably wrestled with plain old arrays and wondered why your app doesn't update magically. Enter Angular signals – the reactive superheroes that make your UI dance without the drama. Let's transition from boring arrays to shiny signals in our todo app. Buckle up! 🚀
+Hey there, future signal masters! 😎 you've probably wrestled with plain old arrays and wondered why your app doesn't update magically. We always needed to call a `loadItems()`method after changing thingies! Enter Angular signals – the reactive superheroes that make your UI dance without the drama. Let's transition from boring arrays to shiny signals in our todo app. Buckle up minions! 🚀
 
 ## What are signals?
 
@@ -126,10 +126,39 @@ effect(() => {
 
 Remember: `.set()` and `.update()` change the signal; `.effect()` reacts to changes. Use them wisely! 🛠️
 
+### What is effect() in Angular Signals?
+effect() is a key part of Angular's signals system for handling reactive side effects. It's a function that runs code whenever the signals it depends on change, making it perfect for tasks like updating the UI, logging, or persisting data. Think of it as a "watcher" that reacts automatically—no manual event listeners needed! 🚀
+
+#### Key Features:
+- Automatic Dependency Tracking: Inside the effect, any signal you read (e.g., todos()) becomes a dependency. When that signal updates, the effect re-runs.
+- Synchronous Execution: Effects run immediately after a signal change, in the same tick.
+- Cleanup: Angular handles cleanup automatically when the component is destroyed, preventing memory leaks.
+- No Return Value: Effects are for side effects only—they don't return data.
+
+#### Common Use Cases:
+- DOM Updates: Reactively update the view (though Angular's templates handle this automatically with signals).
+- Persistence: Save data to localStorage, as in your todo app.
+- API Calls: Trigger network requests on signal changes.
+- Debugging: Log changes for development.
+**In out Todo App code:**
+In app.ts, the effect auto-saves todos to localStorage:
+
+```js
+effect(() => {
+  localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
+});
+```
+
+effect() doesn't always need to be in ngOnInit(), but it's a best practice to place it there (or in the constructor) for reliability. Here's why:
+
+Dependencies Ready: Signals like todos are initialized, and data (e.g., from localStorage) is loaded first. This prevents the effect from running prematurely with stale or undefined values.
+Component Lifecycle: ngOnInit() runs after the component is set up, ensuring the injector and signals are ready. Effects are tied to the component's lifecycle and auto-clean up on destroy.
+
 ## Conclusion: signals win!
 
 There you have it – from array chaos to signal bliss. Your app now reacts like a pro, and you wrote less code. Signals are the future, folks. Embrace them, or get left in the dust! 🌪️
 
 Remember, signals aren't magic – they're just smart. If you mess up, it's probably because you forgot to call `()` on them. Rookie mistake! 😉 Keep coding, and may your builds be green. 🍀
+
 
 Happy signaling! 🎉
