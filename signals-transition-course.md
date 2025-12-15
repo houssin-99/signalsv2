@@ -1,6 +1,6 @@
 # Introduction to signals
 
-Hey there, future signal masters! 😎 you've probably wrestled with plain old arrays and wondered why your app doesn't update magically. We always needed to call a `loadItems()`method after changing thingies! Enter Angular signals – the reactive superheroes that make your UI dance without the drama. Let's transition from boring arrays to shiny signals in our todo app. Buckle up minions! 🚀
+Hey there, future signal masters! 😎 you've probably wrestled with plain old arrays and wondered why your app doesn't update magically. We always needed to call a `loadItems()`method after changing thingies! (OG JS) Enter Angular signals – the reactive superheroes that make your UI dance without the drama. Let's transition from boring arrays to shiny signals in our todo app. Buckle up minions! 🚀
 
 ## What are signals?
 
