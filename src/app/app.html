@@ -37,6 +37,16 @@
             />
             <span>{{ todo.text }}</span>
           </label>
+          <div class="todo-estimation">
+            <label>
+              Estimation (main):
+              <iput
+              type="number"
+              min="0"
+              [(ngModel)]="todo.estimatedMinutes"
+              />
+            </label>
+          </div>
           <button class="ghost" type="button" (click)="removeTodo(todo.id)">
             Remove
           </button>
