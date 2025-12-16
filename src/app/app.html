@@ -35,7 +35,28 @@
               [checked]="todo.done"
               (change)="toggleTodo(todo.id)"
             />
+          <div class="todo-meta">
             <span>{{ todo.text }}</span>
+            <span class="time">
+              {{ Math.floor(todo.spentSeconds / 60) }}m
+              {{ todo.spentSeconds % 60 }}s
+            </span>
+            <button
+              type="button"
+              class="ghost"
+              (click)="toggleTimer(todo.id)"
+            >
+            {{todo.running ? 'stop' : 'start'}}
+            </button>
+          </div>
+            <input
+              type="number"
+              min="0"
+              class="estimate"
+              [value]="todo.estimatedMinutes"
+              (change)="todo.estimatedMinutes = +$event.target.value"
+            />
+            <span calss-="estimated-label">min</span>
           </label>
           <div class="todo-estimation">
             <label>

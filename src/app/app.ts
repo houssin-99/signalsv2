@@ -20,12 +20,29 @@ interface Todo {
   styleUrl: './app.css'
 })
 export class App implements OnInit {
+Math: any;
 
   constructor() {
     // Set up an effect to auto-persist todos whenever they change.
     effect(() => {
       localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
     });
+    effect(() => {
+      const todos = this.todos();
+
+      todos.forEach(todo => {
+        if (todo.running) {
+          setTimeout(() => {
+            this.todos.update(current =>
+              current.map(t =>
+                t.id === todo.id
+                  ? { ...t, spentSeconds: t.spentSeconds + 1 }
+                  : t
+              )
+            );
+          }, 1000);
+        }
+      });    });  
   }
   // Key used to persist todos in localStorage so reads/writes stay consistent.
   protected readonly storageKey = 'minimal-todos';
@@ -58,7 +75,8 @@ export class App implements OnInit {
       running: false
     };
 
-    
+    this.todos.update((current) => [...current, nextTodo]);
+    this.draftText = '';
   }
 
   // Toggle completion state for a single todo item.
@@ -95,4 +113,21 @@ export class App implements OnInit {
       this.todos.set([]);
     }
   }
+
+  // Toggle the timer state for a todo by id.
+  protected toggleTimer(id: number): void {
+    this.todos.update(todos =>
+      todos.map(todo =>
+        todo.id === id
+          ? { ...todo, running: !todo.running }
+          : todo
+      )
+    );
+  }
+
+  // Persist the current todos to localStorage.
+  private persistTodos(): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
+  }
+
 }
