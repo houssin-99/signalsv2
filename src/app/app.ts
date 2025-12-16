@@ -1,6 +1,13 @@
 import { Component, OnInit, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+
+interface Todo {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule],
@@ -8,6 +15,13 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './app.css'
 })
 export class App implements OnInit {
+
+  constructor() {
+    // Set up an effect to auto-persist todos whenever they change.
+    effect(() => {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
+    });
+  }
   // Key used to persist todos in localStorage so reads/writes stay consistent.
   protected readonly storageKey = 'minimal-todos';
 
@@ -15,15 +29,11 @@ export class App implements OnInit {
   protected draftText = '';
 
   // Signal holding the array of todo items for reactive updates.
-  protected todos = signal<Array<{ id: number; text: string; done: boolean }>>([]);
+  protected todos = signal<Todo[]>([]);
 
   // Load any persisted todos as soon as the component initializes, then set up auto-save.
   public ngOnInit(): void {
     this.loadTodosFromStorage();
-    // Auto-save to localStorage whenever todos change.
-    effect(() => {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.todos()));
-    });
   }
 
   // Add a new todo using the current draft text, then reset the input.
@@ -37,14 +47,18 @@ export class App implements OnInit {
     const nextTodo = { id: Date.now(), text, done: false };
     this.todos.update((current) => [...current, nextTodo]);
     this.draftText = '';
+    
   }
 
   // Toggle completion state for a single todo item.
   protected toggleTodo(id: number): void {
     this.todos.update((current) =>
-      current.map((todo) =>
-        todo.id === id ? { ...todo, done: !todo.done } : todo
-      )
+      current.map((todo) => {
+      if (todo.id === id) {
+        return { ...todo, done: !todo.done };
+      }
+      return todo;
+      })
     );
   }
 
