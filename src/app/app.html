@@ -20,14 +20,14 @@
   </form>
 
   <!-- Empty state reminder when no todos exist. -->
-  @if (todos.length === 0) {
+  @if (todos().length === 0) {
     <p class="empty">Nothing here yet—type above and press Add.</p>
   }
 
   <!-- List of todos with checkboxes and delete buttons. -->
-  @if (todos.length > 0) {
+  @if (todos().length > 0) {
     <ul class="todo-list">
-      @for (todo of todos; track todo.id) {
+      @for (todo of todos(); track todo.id) {
         <li class="todo-item" [class.done]="todo.done">
           <label class="todo-body">
             <input
@@ -43,12 +43,5 @@
         </li>
       }
     </ul>
-  }
-
-  <!-- Bulk action to clear completed items. -->
-  @if (todos.some((todo) => todo.done)) {
-    <button class="link" type="button" (click)="clearCompleted()">
-      Clear completed
-    </button>
   }
 </main>
