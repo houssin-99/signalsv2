@@ -6,7 +6,12 @@ interface Todo {
   id: number;
   text: string;
   done: boolean;
+
+  estimatedMinutes: number;
+  spentSeconds: number;
+  running: boolean;
 }
+
 
 @Component({
   selector: 'app-root',
@@ -44,9 +49,15 @@ export class App implements OnInit {
     }
 
     // Simple id using timestamp to avoid collisions in this demo.
-    const nextTodo = { id: Date.now(), text, done: false };
-    this.todos.update((current) => [...current, nextTodo]);
-    this.draftText = '';
+    const nextTodo: Todo = {
+      id: Date.now(),
+      text,
+      done: false,
+      estimatedMinutes: 0,
+      spentSeconds: 0,
+      running: false
+    };
+
     
   }
 
